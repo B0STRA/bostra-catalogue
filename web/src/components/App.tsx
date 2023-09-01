@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import './App.css'
-import {debugData} from "../utils/debugData";
-import {fetchNui} from "../utils/fetchNui";
+import { debugData } from "../utils/debugData";
+import { fetchNui } from "../utils/fetchNui";
+
+
 
 // This will set the NUI to visible if we are
 // developing in browser
@@ -16,7 +18,7 @@ interface ReturnClientDataCompProps {
   data: any
 }
 
-const ReturnClientDataComp: React.FC<ReturnClientDataCompProps> = ({data}) => (
+const ReturnClientDataComp: React.FC<ReturnClientDataCompProps> = ({ data }) => (
   <>
     <h5>Returned Data:</h5>
     <pre>
@@ -28,33 +30,91 @@ const ReturnClientDataComp: React.FC<ReturnClientDataCompProps> = ({data}) => (
 )
 
 interface ReturnData {
-  x: number;
-  y: number;
-  z: number;
+  vehicleBrand: string;
+  vehicleModel: string;
+  vehiclePrice: number;
+  vehicleHash: string;
+  imageUrl: string;
 }
 
+function formatPriceWithCommas(price: number) {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function handleImageError(event: React.SyntheticEvent<HTMLImageElement, Event>) {
+  event.currentTarget.src = '/build/assets/import.png';
+  event.currentTarget.onerror = null;
+  event.currentTarget.classList.add('error');
+}
+
+
+
+
+
 const App: React.FC = () => {
-  const [clientData, setClientData] = useState<ReturnData | null>(null)
+  const [clientData, setClientData] = useState<ReturnData[] | null>(null);
+  const [isContentVisible, setContentVisibility] = useState(true);
 
   const handleGetClientData = () => {
-    fetchNui<ReturnData>('getClientData').then(retData => {
-      console.log('Got return data from client scripts:')
-      console.dir(retData)
-      setClientData(retData)
-    }).catch(e => {
-      console.error('Setting mock data due to error', e)
-      setClientData({ x: 500, y: 300, z: 200})
-    })
-  }
+    fetchNui<ReturnData[]>('getClientData')
+      .then((retData) => {
+        const sortedData = retData.sort((a, b) => a.vehicleBrand.localeCompare(b.vehicleBrand));
+
+        const dataWithImages = sortedData.map((vehicle) => ({
+          ...vehicle,
+          imageUrl: `https://docs.fivem.net/vehicles/${vehicle.vehicleHash}.webp`,
+        }));
+
+        setClientData(dataWithImages);
+        setContentVisibility(false);
+      })
+      .catch((e) => {
+        console.error('Setting mock data due to error', e);
+        setClientData([{ vehicleBrand: '', vehicleModel: '', vehiclePrice: 0, vehicleHash: '', imageUrl: '' }]);
+        setContentVisibility(false);
+      });
+  };
+
 
   return (
     <div className="nui-wrapper">
       <div className='popup-thing'>
         <div>
-          <h1>This is the NUI Popup!</h1>
-          <p>Exit with the escape key</p>
-          <button onClick={handleGetClientData}>Get Client Data</button>
-          {clientData && <ReturnClientDataComp data={clientData} />}
+          {isContentVisible && (
+            <>
+              <h1>Browse Vehicle Catalogue</h1>
+              <p>Exit with ESC</p>
+            </>
+          )}
+          <button onClick={handleGetClientData}>Search</button>
+          {clientData && (
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Vehicle Make</th>
+                    <th>Vehicle Model</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clientData.map((vehicle, index) => (
+                    <tr key={index}>
+                      <td>{vehicle.vehicleBrand}</td>
+                      <td>{vehicle.vehicleModel}</td>
+                      <td>{formatPriceWithCommas(vehicle.vehiclePrice)}</td>
+                      <td>
+                        <div className="image-container">
+                          <img src={vehicle.imageUrl || '/build/assets/import.png'} alt="Vehicle" onError={handleImageError} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
