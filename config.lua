@@ -12,14 +12,6 @@ Config = {
 			pointHeading = 28.87, --Heading of Box Zone
 			useProp = true, --Uses propModel if true
 			distance = 3.0, --Distance to interact if using targetResource "dist" or target distance 
-			blip = { 
-				enable = true, --Enables blip if true
-				sprite = 225, --Blip sprite
-				distance = 3.0, --Distance to interact
-				color = 5, --Blip color
-				scale = 0.8, --Blip scale
-				label = "Luxury Catalogue", --Blip label
-			}
 		},
 		[2] = {
 			targetId = "vehicle_catalogue2",
