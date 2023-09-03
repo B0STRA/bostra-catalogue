@@ -1,5 +1,3 @@
-  ![bostra-ad](https://github.com/B0STRA/bostra-catalogue/assets/119994243/02df6832-ae59-4491-9709-b78ce138ff5f)
-
 <h1>
  
  [PREVIEW](https://streamable.com/m3mz70)
