@@ -6,16 +6,7 @@ VehicleModels = {}
 VehicleBrands = {}
 VehiclePrices = {}
 VehicleHashes = {}
-AddEventHandler("onResourceStart", function(resource)
-	if resource ~= GetCurrentResourceName() then
-		return
-	end
-	LoadVehicles()
-	Wait(10)
-	LoadMenu()
-	InitTargets()
-	SpawnProp(Config.propModel)
-end)
+
 function UnloadModel(model)
 	if Config.Debug then
 		print("Debug:Removing Model:" .. model)
@@ -32,7 +23,6 @@ function SpawnProp(prop)
 		SetEntityHeading(Props[k], v.pointHeading)
 		SetEntityAsMissionEntity(Props[k], true, true)
 		FreezeEntityPosition(Props[k], true)
-		SetEntityCollision(Props[k], false, false)
 	end
 end
 function DeleteProp(Props)
@@ -49,7 +39,7 @@ function LoadVehicles()
 	local vehicles = {}
 
 	for k, v in pairs(QBCore.Shared.Vehicles) do
-		if v.shop == "luxury" then
+		if v.shop == Config.shopName then
 			local vehicleData = {
 				model = v.name,
 				brand = v.brand,
@@ -103,7 +93,7 @@ function InitTargets()
 						iconColor = "#DA9110",
 						distance = 3.0,
 						onSelect = function()
-							if v.useLib then
+							if v.UseLib then
 								lib.showContext("catalogue_menu")
 							else
 								ToggleNuiFrame(true)
@@ -113,15 +103,75 @@ function InitTargets()
 				},
 			}
 			Targets[k] = exports.ox_target:addBoxZone(params)
-		else
-			return
+		elseif Config.targetResource == "qb" then
+			Targets[k] = exports["qb-target"]:AddBoxZone(v.targetId .. k, v.point, 1.0, 1.0, {
+				name = v.targetId,
+				heading = v.pointHeading,
+				debugPoly = Config.Debug,
+				useZ = true,
+			}, {
+				options = {
+					{
+						label = "Browse Catalogue",
+						icon = "fas fa-car",
+						action = function()
+							if v.UseLib then
+								lib.showContext("catalogue_menu")
+							else
+								ToggleNuiFrame(true)
+							end
+						end,
+					},
+				},
+				distance = 3.0,
+			})
+		elseif Config.targetResource == "dist" then
+			for k, v in pairs(Config.targetLocs) do
+				Targets[k] = lib.zones.box({
+					coords = v.point,
+					radius = v.distance,
+					rotation = v.pointHeading,
+					debug = Config.Debug,
+					onEnter = function()
+						lib.showTextUI("Press [E] to browse catalogue", {
+							position = "right-center",
+							icon = "fas fa-car",
+							iconColor = "#DA9110",
+							style = {
+								borderRadius = 10,
+								backgroundColor = "#000000",
+								color = "#FFFFFF",
+							},
+						})
+					end,
+					inside = function()
+						if IsControlJustPressed(0, 38) then
+							if v.UseLib then
+								lib.hideTextUI()
+								lib.showContext("catalogue_menu")
+							else
+								lib.hideTextUI()
+								ToggleNuiFrame(true)
+							end
+						end
+					end,
+					onExit = function()
+						lib.hideTextUI()
+					end,
+				})
+			end
 		end
 	end
 end
-if Config.useCommand then
-	RegisterCommand("show-nui", function()
+
+if Config.UseCommand then
+	RegisterCommand("catalogue", function()
 		ToggleNuiFrame(true)
 		debugPrint("Show NUI frame")
+	end, false)
+	RegisterCommand("closecatalogue", function()
+		ToggleNuiFrame(false)
+		debugPrint("Hide NUI frame")
 	end, false)
 end
 RegisterNUICallback("hideFrame", function(_, cb)
@@ -133,20 +183,35 @@ RegisterNUICallback("getClientData", function(data, cb)
 	debugPrint("Data sent by React", json.encode(data))
 
 	local vehiclesData = {}
-	for k, v in pairs(QBCore.Shared.Vehicles) do
-		if v.shop == "luxury" then
-			local vehicleData = {
-				vehicleModel = v.name,
-				vehicleBrand = v.brand,
-				vehiclePrice = " " .. "$ " .. v.price,
-				vehicleHash = v.model,
-			}
+	for k, v in pairs(VehicleModels) do
+		local vehicleData = {
+			vehicleModel = v,
+			vehicleBrand = VehicleBrands[k],
+			vehiclePrice = " $" .. VehiclePrices[k],
+			vehicleHash = VehicleHashes[k],
+		}
 
-			table.insert(vehiclesData, vehicleData)
-		end
+		table.insert(vehiclesData, vehicleData)
 	end
 	cb(vehiclesData)
 end)
+RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
+	SpawnProp(Config.propModel)
+	LoadVehicles()
+	LoadMenu()
+	InitTargets()
+end)
+
+AddEventHandler("onResourceStart", function(resource)
+	if resource ~= GetCurrentResourceName() then
+		return
+	end
+	SpawnProp(Config.propModel)
+	LoadVehicles()
+	LoadMenu()
+	InitTargets()
+end)
+
 AddEventHandler("onResourceStop", function(resource)
 	if resource ~= GetCurrentResourceName() then
 		return
@@ -156,7 +221,7 @@ AddEventHandler("onResourceStop", function(resource)
 			exports.ox_target:removeZone(v.targetId)
 		else
 			if Config.targetResource == "qb" then
-				return
+				exports["qb-target"]:RemoveZone(v.targetId)
 			end
 		end
 	end

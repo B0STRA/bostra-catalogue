@@ -4,7 +4,6 @@ import { debugData } from "../utils/debugData";
 import { fetchNui } from "../utils/fetchNui";
 
 
-
 // This will set the NUI to visible if we are
 // developing in browser
 debugData([
@@ -42,7 +41,7 @@ function formatPriceWithCommas(price: number) {
 }
 
 function handleImageError(event: React.SyntheticEvent<HTMLImageElement, Event>) {
-  event.currentTarget.src = '/build/assets/import.png';
+  event.currentTarget.src = '/web/build/assets/import.png';
   event.currentTarget.onerror = null;
   event.currentTarget.classList.add('error');
 }
@@ -106,7 +105,7 @@ const App: React.FC = () => {
                       <td>{formatPriceWithCommas(vehicle.vehiclePrice)}</td>
                       <td>
                         <div className="image-container">
-                          <img src={vehicle.imageUrl || '/build/assets/import.png'} alt="Vehicle" onError={handleImageError} />
+                          <img src={vehicle.imageUrl || '/web/build/assets/import.png'} alt={vehicle.vehicleModel} onError={handleImageError} />
                         </div>
                       </td>
                     </tr>
