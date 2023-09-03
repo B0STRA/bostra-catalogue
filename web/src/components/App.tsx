@@ -87,6 +87,7 @@ const App: React.FC = () => {
           )}
           <button onClick={handleGetClientData}>Search</button>
           {clientData && (
+            <div className="table-container-wrapper">
             <div className="table-container">
               <table>
                 <thead>
@@ -112,6 +113,7 @@ const App: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
             </div>
           )}
         </div>
