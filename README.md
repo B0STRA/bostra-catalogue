@@ -23,7 +23,7 @@
 <li>Drag bostra-catalogue **LATEST RELEASE** into resources</li>
 <li>Ensure after ox_lib, qb-core, and target resource if in use</li>
 </ul>
-
+ 
 <h1>Credits</h1>
  <ul>
   
