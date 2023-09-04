@@ -24,8 +24,6 @@
 <li>Ensure after ox_lib, qb-core, and target resource if in use</li>
 </ul>
 
-
-
 <h1>Credits</h1>
  <ul>
   
@@ -35,7 +33,12 @@
  <h1>Support</h1>
 <u1>
 
-[Join md-scripts Discord](https://discord.gg/RVx8nVwcEG)
+[Bostra-Development Discord](https://discord.gg/WC6McBQ5r8)
 
+</u1>
+
+<u1>
+
+[md-scripts Discord](https://discord.gg/RVx8nVwcEG)
 
 </u1>
