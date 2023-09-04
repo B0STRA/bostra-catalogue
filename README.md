@@ -13,7 +13,7 @@
 <h1>Dependencies</h1> 
  <ul>
   
-[ox_lib](https://github.com/overextended/ox_lib)<br>
+[ox_lib](https://github.com/overextended/ox_lib) for ox_lib menu instead of NUI, and lib zones instead of target<br>
 [ox_target](https://github.com/overextended/ox_target) or [qb-target](https://github.com/qbcore-framework/qb-target) (optional)<br>
 [qb core](https://github.com/qbcore-framework/qb-core)<br>
  </ul>
