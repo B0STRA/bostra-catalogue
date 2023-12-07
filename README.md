@@ -31,11 +31,6 @@
  </ul>
 
  <h1>Support</h1>
-<u1>
-
-[Bostra-Development Discord](https://discord.gg/WC6McBQ5r8)
-
-</u1>
 
 <u1>
 
